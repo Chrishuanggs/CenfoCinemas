@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace DataAccess.DAO
 {
-    internal class SqlOperations
+    public class SqlOperation
     {
+        public string ProcedureName { get; set; }
+        public List<String> Parameters { get; set; }
     }
 }

@@ -97,7 +97,7 @@ public class Program{
                 var desc = Console.ReadLine();
 
                 Console.WriteLine("Digite la fecha de lanzamiento");
-                var rDate = DateTime.Parse(Console.ReadLine());
+              var rDate = DateTime.Parse(Console.ReadLine());
 
                 Console.WriteLine("Digite el genero de la pelicula");
                 var genre = Console.ReadLine();
@@ -116,7 +116,8 @@ public class Program{
                     Director = director
     
                 };
-                mCrud.Create(movie);
+                var mm = new MovieManager();
+                mm.Create(movie);
                 break;
 
             case 7:

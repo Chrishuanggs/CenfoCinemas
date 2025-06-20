@@ -8,44 +8,49 @@ using System.Threading.Tasks;
 
 namespace CoreApp
 {
-    public class MovieManager : BaseManager 
+    public class MovieManager : BaseManager
     {
+        public MovieManager() { }
+
+        /*
+         * Método para la creación de una película
+         * Valida que la fecha de lanzamiento no sea futura
+         * Valida que el título no esté duplicado
+         * Valida que los campos obligatorios tengan contenido
+         */
         public void Create(Movie movie)
         {
             try
             {
-                //Validar la edad
-                if (IsOver18(user))
+                // Validar que los campos obligatorios tengan contenido
+                if (ValidateRequiredFields(movie))
                 {
-                    var uCrud = new UserCrudFactory();
+                    var mCrud = new MovieCrudFactory();
 
-                    //Consultar en la DB si existe con ese codigo
-                    var uExist = uCrud.RetrieveByUserCode<User>(user);
-
-                    if (uExist == null)
+                    // Validar que la fecha de lanzamiento no sea futura
+                    if (IsValidReleaseDate(movie.ReleaseDate))
                     {
 
-                        //Consultar si existe por correo
-                        uExist = uCrud.RetrieveByEmail<User>(user);
+                        // Consultar en la DB si existe una película con ese título
+                        var movieExists = mCrud.RetrieveByTitle<Movie>(movie);
 
-                        if (uExist == null)
+                        if (movieExists == null)
                         {
-                            uCrud.Create(user);
-                            //Enviar el correo
+                            mCrud.Create(movie);
                         }
                         else
                         {
-                            throw new Exception("Este correo electronico no esta disponible o ya se encuentra registrado");
+                            throw new Exception("Ya existe una película con ese título");
                         }
                     }
                     else
                     {
-                        throw new Exception("El codigo de usuario no esta dispoible");
+                        throw new Exception("La fecha de lanzamiento no puede ser en el futuro");
                     }
                 }
                 else
                 {
-                    throw new Exception("Usuario no tiene 18");
+                    throw new Exception("Todos los campos obligatorios deben ser completados");
                 }
             }
             catch (Exception ex)
@@ -53,17 +58,23 @@ namespace CoreApp
                 ManagerException(ex);
             }
         }
-        private bool IsOver18(User user)
+
+        
+         // Metodo para validar que todos los campos obligatorios esten completos
+      
+        private bool ValidateRequiredFields(Movie movie)
         {
+            return !string.IsNullOrEmpty(movie.Title) &&
+                   !string.IsNullOrEmpty(movie.Description) &&
+                   !string.IsNullOrEmpty(movie.Genre) &&
+                   !string.IsNullOrEmpty(movie.Director);
+        }
 
-            var currentDate = DateTime.Now;
-            int age = currentDate.Year - user.BirthDate.Year;
-
-            if (user.BirthDate > currentDate.AddYears(-age).Date)
-            {
-                age--;
-            }
-            return age >= 18;
+          //Metodo para validar que la fecha de lanzamiento no sea futura
+         
+        private bool IsValidReleaseDate(DateTime releaseDate)
+        {
+            return releaseDate <= DateTime.Now;
         }
     }
 }

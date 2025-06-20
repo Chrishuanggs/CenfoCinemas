@@ -1,8 +1,11 @@
 ﻿using DataAccess.CRUD;
 using DTOs;
+using SendGrid;
+using SendGrid.Helpers.Mail;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -36,7 +39,7 @@ namespace CoreApp
 
                         if (uExist == null) {
                             uCrud.Create(user);
-                            //Enviar el correo
+                        SendWelcomeEmail(user);
                         }
                         else
                         {
@@ -57,6 +60,21 @@ namespace CoreApp
             {
                 ManagerException(ex);
             }
+        }
+        async Task SendWelcomeEmail(User user)
+        {
+            var apiKey = "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";
+            var client = new SendGridClient(apiKey);
+
+            var from = new EmailAddress("chuangr@ucenfotec.ac.cr", "Chris Huang");
+            var to = new EmailAddress(user.Email, user.Name);
+            var subject = "¡Bienvenido a CenfoCinemas" + user.Name + "!";
+
+            var plainTextContent = $"Hola {user.Name}, te damos la bienvenida a CenfoCinemas. Estamos emocionados de tenerte con nosotros.";
+            var htmlContent = $"<strong>Hola {user.Name}</strong>, te damos la bienvenida a CenfoCinemas. Estamos emocionados de tenerte con nosotros. <br/><br/>Registrate en CenfoCinemas para registrarte de CenfoCinemas. Tu codigo de usuario es <strong>{user.UserCode}</strong><br/>con nosotros.<br/>Saludos,<br/>Equipo administrativo de CenfoCinemas<br/><br/>Puedes contactarnos en info@cenfocinemas.com<br/>msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);";
+
+            var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+            var response = await client.SendEmailAsync(msg).ConfigureAwait(false);
         }
         private bool IsOver18(User user)
         {

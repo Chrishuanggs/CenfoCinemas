@@ -57,9 +57,20 @@ namespace DataAccess.CRUD
             return lstMovies;
         }
 
-        public override T RetrieveById<T>()
+        public override T RetrieveById<T>(int id)
         {
-            throw new NotImplementedException();
+            var sqlOperation = new SqlOperation() { ProcedureName = "RET_MOVIE_BY_ID_PR" };
+            sqlOperation.AddIntParam("P_Id", id);
+            var lstResults = _sqlDao.ExecuteQueryProcedure(sqlOperation);
+
+            if (lstResults.Count > 0)
+            {
+                var row = lstResults[0]; // Tomamos el primer (y único) resultado
+                var movie = BuildMovie(row);
+                return (T)Convert.ChangeType(movie, typeof(T));
+            }
+
+            return default(T); // Retorna null si no se encuentra el usuario
         }
 
         public override void Update(BaseDTO baseDTO)

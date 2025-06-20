@@ -10,13 +10,15 @@ public class Program{
 
         Console.WriteLine("Seleccione la opcion deseada: ");
         Console.WriteLine("1. Crear usuario");
-        Console.WriteLine("2. Consultar usuarios");
-        Console.WriteLine("3. Actualizar usuarios");
-        Console.WriteLine("4. Eliminar usuario");
-        Console.WriteLine("5. Crear pelicula");
-        Console.WriteLine("6. Consultar peliculas");
-        Console.WriteLine("7. Actualizar pelicula");
-        Console.WriteLine("8. Eliminar pelicula");
+        Console.WriteLine("2. Consultar todos los usuarios");
+        Console.WriteLine("3. Consultar usuario por ID");
+        Console.WriteLine("4. Actualizar usuarios");
+        Console.WriteLine("5. Eliminar usuario");
+        Console.WriteLine("6. Crear pelicula");
+        Console.WriteLine("7. Consultar todas las peliculas");
+        Console.WriteLine("8. Consultar pelicula por ID");
+        Console.WriteLine("9. Actualizar pelicula");
+        Console.WriteLine("10. Eliminar pelicula");
 
         var option = Int32.Parse(Console.ReadLine());
 
@@ -68,7 +70,24 @@ public class Program{
                 }
                 break;
 
-            case 5:
+            case 3:
+                uCrud = new UserCrudFactory();
+                Console.WriteLine("Digite el ID del usuario a consultar: ");
+                var userId = Int32.Parse(Console.ReadLine());
+
+                var userById = uCrud.RetrieveById<User>(userId);
+                if (userById != null)
+                {
+                    Console.WriteLine("Usuario encontrado:");
+                    Console.WriteLine(JsonConvert.SerializeObject(userById));
+                }
+                else
+                {
+                    Console.WriteLine("Usuario no encontrado.");
+                }
+                break;
+
+            case 6:
                 var mCrud = new MovieCrudFactory();
                 Console.WriteLine("Digite el titulo");
                 var title = Console.ReadLine();
@@ -99,7 +118,7 @@ public class Program{
                 mCrud.Create(movie);
                 break;
 
-            case 6:
+            case 7:
 
                 mCrud = new MovieCrudFactory();
                 var listMovies = mCrud.RetrieveAll<Movie>();
@@ -109,6 +128,24 @@ public class Program{
                 }
 
                 break;
+
+            case 8:
+                mCrud = new MovieCrudFactory();
+                Console.WriteLine("Digite el ID de la pelicula a consultar: ");
+                var movieId = Int32.Parse(Console.ReadLine());
+
+                var movieById = mCrud.RetrieveById<Movie>(movieId);
+                if (movieById != null)
+                {
+                    Console.WriteLine("Pelicula encontrada:");
+                    Console.WriteLine(JsonConvert.SerializeObject(movieById));
+                }
+                else
+                {
+                    Console.WriteLine("Pelicula no encontrada.");
+                }
+                break;
+
         }
 
         // Ejecucion de procedures

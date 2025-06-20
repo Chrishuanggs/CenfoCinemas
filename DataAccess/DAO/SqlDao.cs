@@ -1,8 +1,9 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
 
 namespace DataAccess.DAOs
 {
@@ -45,23 +46,33 @@ namespace DataAccess.DAOs
 
         public void ExecuteProcedure(SqlOperation sqlOperation)
         {
+            // Validar entrada
+            if (sqlOperation == null)
+                throw new ArgumentNullException(nameof(sqlOperation));
+
+            if (string.IsNullOrWhiteSpace(sqlOperation.ProcedureName))
+                throw new ArgumentException("El nombre del procedimiento no puede estar vacío");
+
             using (var conn = new SqlConnection(_connectionString))
             {
-                using (var command = new SqlCommand(sqlOperation.ProcedureName, conn)
+                using (var cmd = new SqlCommand(sqlOperation.ProcedureName, conn))
                 {
-                    CommandType = System.Data.CommandType.StoredProcedure
-                })
-                {
-                    //Set de los parametros
-                    foreach (var param in sqlOperation.Parameters)
-                    {
-                        command.Parameters.Add(param);
-                    }
-                    //Ejectura el SP
-                    conn.Open();
-                    command.ExecuteNonQuery();
-                }
+                    // Importante: establecer el tipo de comando ANTES de agregar parámetros
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
+                    // Agregar parámetros si existen
+                    if (sqlOperation.Parameters != null)
+                    {
+                        foreach (var param in sqlOperation.Parameters)
+                        {
+                            cmd.Parameters.Add(param);
+                        }
+                    }
+
+                    // Abrir conexión y ejecutar
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
 

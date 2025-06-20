@@ -1,4 +1,6 @@
-﻿using DataAccess.DAOs;
+﻿using DataAccess.CRUD;
+using DataAccess.DAOs;
+using DTOs;
 using SqlOperation = DataAccess.DAOs.SqlOperation;
 
 public class Program{
@@ -40,14 +42,20 @@ public class Program{
                 Console.WriteLine("Digite la fecha de nacimiento del usuario: ");
                 var bdate = DateTime.Parse(Console.ReadLine());
 
-                sqlOperation.ProcedureName = "CRE_USER_PR";
+                //Crear objeto a partir de los valores capturados en consola
+                var user = new User()
+                {
+                    UserCode = userCode,
+                    Name = name,
+                    Email = email,
+                    Password = password,
+                    Status = status,
+                    BirthDate = bdate
+                };
+                var uCrud = new UserCrudFactory();
+                uCrud.Create(user);
 
-                sqlOperation.AddStringParameter("P_UserCode", userCode);
-                sqlOperation.AddStringParameter("P_Name", name);
-                sqlOperation.AddStringParameter("P_Email", email);
-                sqlOperation.AddStringParameter("P_Password", password);
-                sqlOperation.AddStringParameter("P_Status", status);
-                sqlOperation.AddDateTimeParam("P_BirthDate", bdate);
+
                 break;
 
             case 5:

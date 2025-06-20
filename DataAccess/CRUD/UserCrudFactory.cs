@@ -44,7 +44,19 @@ namespace DataAccess.CRUD
 
         public override List<T> RetrieveAll<T>()
         {
-            throw new NotImplementedException();
+            var lstUsers= new List<T>();
+            var sqlOperation = new SqlOperation() { ProcedureName = "RET_ALL_USERS_PR" };
+            var lstResults=_sqlDao.ExecuteQueryProcedure(sqlOperation);
+
+            if (lstResults.Count > 0)
+            {
+                foreach (var row in lstResults)
+                {
+                    var user = BuildUser(row);
+                    lstUsers.Add((T)Convert.ChangeType(user, typeof(T)));
+                }
+            }
+            return lstUsers;
         }
 
         public override T RetrieveById<T>()
@@ -55,6 +67,24 @@ namespace DataAccess.CRUD
         public override void Update(BaseDTO baseDTO)
         {
             throw new NotImplementedException();
+        }
+
+        //Metodo que convierte el diccionario en un usuario
+        private User BuildUser(Dictionary<string, object> row)
+        {
+            var user = new User()
+            {
+                Id = (int)row["Id"],
+                Created = (DateTime)row["Created"],
+                //Updated = (DateTime)row["Updated"],
+                UserCode = (string)row["UserCode"],
+                Name = (string)row["Name"],
+                Email = (string)row["Email"],
+                Password = (string)row["Password"],
+                Status = (string)row["Status"],
+                BirthDate = (DateTime)row["BirthDate"]
+            };
+            return user;
         }
     }
 }

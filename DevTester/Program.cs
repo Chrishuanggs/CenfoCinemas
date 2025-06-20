@@ -1,6 +1,7 @@
 ﻿using DataAccess.CRUD;
 using DataAccess.DAOs;
 using DTOs;
+using Newtonsoft.Json;
 using SqlOperation = DataAccess.DAOs.SqlOperation;
 
 public class Program{
@@ -25,6 +26,7 @@ public class Program{
         switch (option)
         {
             case 1:
+                var uCrud = new UserCrudFactory();
                 Console.WriteLine("Digite el codigo de usuario: ");
                 var userCode=Console.ReadLine();
 
@@ -52,13 +54,22 @@ public class Program{
                     Status = status,
                     BirthDate = bdate
                 };
-                var uCrud = new UserCrudFactory();
                 uCrud.Create(user);
 
 
                 break;
 
+            case 2:
+                uCrud = new UserCrudFactory();
+                var listUsers = uCrud.RetrieveAll<User>();
+                foreach(var u in listUsers)
+                {
+                    Console.WriteLine(JsonConvert.SerializeObject(u));
+                }
+                break;
+
             case 5:
+                var mCrud = new MovieCrudFactory();
                 Console.WriteLine("Digite el titulo");
                 var title = Console.ReadLine();
 
@@ -75,14 +86,28 @@ public class Program{
                 var director = Console.ReadLine();
 
 
-                sqlOperation.ProcedureName = "CRE_MOVIE_PR";
+                //Crear objeto a partir de los valores capturados en consola
+                var movie = new Movie()
+                {
+                    Title = title,
+                    Description = desc,
+                    ReleaseDate = rDate,
+                    Genre = genre,
+                    Director = director
+    
+                };
+                mCrud.Create(movie);
+                break;
 
-                sqlOperation.AddStringParameter("P_Title", title);
-                sqlOperation.AddStringParameter("P_Description", desc);
-                sqlOperation.AddDateTimeParam("P_ReleaseDate", rDate);
-                sqlOperation.AddStringParameter("P_Genre", "test");
-                sqlOperation.AddStringParameter("P_Status", "AC");
-                sqlOperation.AddDateTimeParam("P_BirthDate", DateTime.Now);
+            case 6:
+
+                mCrud = new MovieCrudFactory();
+                var listMovies = mCrud.RetrieveAll<Movie>();
+                foreach (var u in listMovies)
+                {
+                    Console.WriteLine(JsonConvert.SerializeObject(u));
+                }
+
                 break;
         }
 

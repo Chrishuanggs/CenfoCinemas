@@ -28,7 +28,7 @@ namespace DataAccess.DAOs
         //Paso 2: Redefinir el constructor default y convertirlo en privado
         private SqlDao()
         {
-            _connectionString = @"Data Source=.;Initial Catalog=shopping-cart-db2;Integrated Security=True;Trust Server Certificate=True";
+            _connectionString = @"Data Source=.;Initial Catalog=cenfocinemas-db;Integrated Security=True;Trust Server Certificate=True";
         }
 
         //Paso 3: Definir el metodo que expone la unica instancia de SqlDao

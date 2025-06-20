@@ -42,5 +42,9 @@ namespace DataAccess.DAOs
             Parameters.Add(new SqlParameter(paramName, paramValue));
         }
 
+        internal void AddStringParameter(string v, DateTime releaseDate)
+        {
+            Parameters.Add(new SqlParameter(v, releaseDate));
+        }
     }
 }

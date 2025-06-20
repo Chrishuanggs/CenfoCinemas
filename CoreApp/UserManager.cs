@@ -39,7 +39,7 @@ namespace CoreApp
 
                         if (uExist == null) {
                             uCrud.Create(user);
-                        SendWelcomeEmail(user);
+                            SendWelcomeEmail(user.Email, user.Name);
                         }
                         else
                         {
@@ -61,20 +61,18 @@ namespace CoreApp
                 ManagerException(ex);
             }
         }
-        async Task SendWelcomeEmail(User user)
+        async Task SendWelcomeEmail(string email,string name)
         {
-            var apiKey = "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";
+            var apiKey = Environment.GetEnvironmentVariable("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");
             var client = new SendGridClient(apiKey);
-
-            var from = new EmailAddress("chuangr@ucenfotec.ac.cr", "Chris Huang");
-            var to = new EmailAddress(user.Email, user.Name);
-            var subject = "¡Bienvenido a CenfoCinemas" + user.Name + "!";
-
-            var plainTextContent = $"Hola {user.Name}, te damos la bienvenida a CenfoCinemas. Estamos emocionados de tenerte con nosotros.";
-            var htmlContent = $"<strong>Hola {user.Name}</strong>, te damos la bienvenida a CenfoCinemas. Estamos emocionados de tenerte con nosotros. <br/><br/>Registrate en CenfoCinemas para registrarte de CenfoCinemas. Tu codigo de usuario es <strong>{user.UserCode}</strong><br/>con nosotros.<br/>Saludos,<br/>Equipo administrativo de CenfoCinemas<br/><br/>Puedes contactarnos en info@cenfocinemas.com<br/>msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);";
-
-            var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+            var from_email = new EmailAddress("chuangr@ucenfotec.ac.cr", "Chris Huang");
+            var subject = "Bienvenido a CenfoCinemas!";
+            var to_email = new EmailAddress(email, name);
+            var plainTextContent = "Hola, " + name + "Bienvenid@!";
+            var htmlContent = "<strong>and easy to do anywhere, even with C#</strong>";
+            var msg = MailHelper.CreateSingleEmail(from_email, to_email, subject, plainTextContent, htmlContent);
             var response = await client.SendEmailAsync(msg).ConfigureAwait(false);
+
         }
         private bool IsOver18(User user)
         {

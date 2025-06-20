@@ -1,4 +1,5 @@
-﻿using DataAccess.CRUD;
+﻿using CoreApp;
+using DataAccess.CRUD;
 using DataAccess.DAOs;
 using DTOs;
 using Newtonsoft.Json;
@@ -56,8 +57,8 @@ public class Program{
                     Status = status,
                     BirthDate = bdate
                 };
-                uCrud.Create(user);
-
+                var um = new UserManager();
+                um.Create(user);
 
                 break;
 
@@ -145,7 +146,6 @@ public class Program{
                     Console.WriteLine("Pelicula no encontrada.");
                 }
                 break;
-
         }
 
         // Ejecucion de procedures

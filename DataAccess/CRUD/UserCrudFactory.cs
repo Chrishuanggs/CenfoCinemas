@@ -21,7 +21,7 @@ namespace DataAccess.CRUD
         {
             var user = baseDTO as User;
 
-            var sqlOperation = new SqlOperation() { ProcedureName = "dbo.CRE_USER_PR" };
+            var sqlOperation = new SqlOperation() { ProcedureName = "CRE_USER_PR" };
             sqlOperation.AddStringParameter("P_UserCode", user.UserCode);
             sqlOperation.AddStringParameter("P_Name", user.Name);
             sqlOperation.AddStringParameter("P_Email", user.Email);

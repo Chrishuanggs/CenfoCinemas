@@ -28,7 +28,7 @@ namespace DataAccess.DAOs
         //Paso 2: Redefinir el constructor default y convertirlo en privado
         private SqlDao()
         {
-            _connectionString = @"Data Source=.;Initial Catalog=cenfocinemas-db;Integrated Security=True;Trust Server Certificate=True";
+            _connectionString = @"Data Source=.;Initial Catalog=shopping-cart-db2;Integrated Security=True;Trust Server Certificate=True";
         }
 
         //Paso 3: Definir el metodo que expone la unica instancia de SqlDao
@@ -46,33 +46,23 @@ namespace DataAccess.DAOs
 
         public void ExecuteProcedure(SqlOperation sqlOperation)
         {
-            // Validar entrada
-            if (sqlOperation == null)
-                throw new ArgumentNullException(nameof(sqlOperation));
-
-            if (string.IsNullOrWhiteSpace(sqlOperation.ProcedureName))
-                throw new ArgumentException("El nombre del procedimiento no puede estar vacío");
-
             using (var conn = new SqlConnection(_connectionString))
             {
-                using (var cmd = new SqlCommand(sqlOperation.ProcedureName, conn))
+                using (var command = new SqlCommand(sqlOperation.ProcedureName, conn)
                 {
-                    // Importante: establecer el tipo de comando ANTES de agregar parámetros
-                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
-
-                    // Agregar parámetros si existen
-                    if (sqlOperation.Parameters != null)
+                    CommandType = System.Data.CommandType.StoredProcedure
+                })
+                {
+                    //Set de los parametros
+                    foreach (var param in sqlOperation.Parameters)
                     {
-                        foreach (var param in sqlOperation.Parameters)
-                        {
-                            cmd.Parameters.Add(param);
-                        }
+                        command.Parameters.Add(param);
                     }
-
-                    // Abrir conexión y ejecutar
+                    //Ejectura el SP
                     conn.Open();
-                    cmd.ExecuteNonQuery();
+                    command.ExecuteNonQuery();
                 }
+
             }
         }
 

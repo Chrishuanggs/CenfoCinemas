@@ -88,6 +88,5 @@ public class Program{
 
         // Ejecucion de procedures
         var sqlDao = SqlDao.GetInstance();
-        sqlDao.ExecuteProcedure(sqlOperation);
     }
 }

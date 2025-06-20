@@ -14,6 +14,7 @@ namespace CoreApp
     public class UserManager : BaseManager
     {
         public UserManager() { }
+
         /*
          * Metodo para la creacion de un usuario
          * Valida que el usuario sea mayor de 18 years
@@ -21,25 +22,27 @@ namespace CoreApp
          * Valida que el correo electronico no este registrado
          * Envia un correo electronico de bienvenida
          */
-        public void Create(User user)
+        public async Task Create(User user)
         {
             try
             {
                 //Validar la edad
-                if (IsOver18(user)) {
+                if (IsOver18(user))
+                {
                     var uCrud = new UserCrudFactory();
 
                     //Consultar en la DB si existe con ese codigo
                     var uExist = uCrud.RetrieveByUserCode<User>(user);
-                   
-                    if (uExist == null) {
 
+                    if (uExist == null)
+                    {
                         //Consultar si existe por correo
-                       uExist=uCrud.RetrieveByEmail<User>(user);
+                        uExist = uCrud.RetrieveByEmail<User>(user);
 
-                        if (uExist == null) {
+                        if (uExist == null)
+                        {
                             uCrud.Create(user);
-                            SendWelcomeEmail(user.Email, user.Name);
+                            await SendWelcomeEmail(user.Email, user.Name);
                         }
                         else
                         {
@@ -48,12 +51,12 @@ namespace CoreApp
                     }
                     else
                     {
-                        throw new Exception("El codigo de usuario no esta dispoible");
+                        throw new Exception("El codigo de usuario no esta disponible");
                     }
                 }
                 else
                 {
-                    throw new Exception("Usuario no tiene 18");
+                    throw new Exception("Usuario debe ser mayor de 18 años");
                 }
             }
             catch (Exception ex)
@@ -61,22 +64,58 @@ namespace CoreApp
                 ManagerException(ex);
             }
         }
-        async Task SendWelcomeEmail(string email,string name)
-        {
-            var apiKey = Environment.GetEnvironmentVariable("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");
-            var client = new SendGridClient(apiKey);
-            var from_email = new EmailAddress("chuangr@ucenfotec.ac.cr", "Chris Huang");
-            var subject = "Bienvenido a CenfoCinemas!";
-            var to_email = new EmailAddress(email, name);
-            var plainTextContent = "Hola, " + name + "Bienvenid@!";
-            var htmlContent = "<strong>and easy to do anywhere, even with C#</strong>";
-            var msg = MailHelper.CreateSingleEmail(from_email, to_email, subject, plainTextContent, htmlContent);
-            var response = await client.SendEmailAsync(msg).ConfigureAwait(false);
 
+        private async Task SendWelcomeEmail(string email, string name)
+        {
+            try
+            {
+                // La API key debe estar en configuración o variables de entorno
+                // NO hardcodear la API key en el código
+                var apiKey = Environment.GetEnvironmentVariable("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");
+
+                if (string.IsNullOrEmpty(apiKey))
+                {
+                    Console.WriteLine("Warning: SendGrid API key not found. Email not sent.");
+                    return;
+                }
+
+                var client = new SendGridClient(apiKey);
+                var from_email = new EmailAddress("chrishuang060@gmail.com", "CenfoCinemas");
+                var subject = "¡Bienvenido a CenfoCinemas!";
+                var to_email = new EmailAddress(email, name);
+
+                var plainTextContent = $"Hola {name},\n\n¡Bienvenid@ a CenfoCinemas! Tu cuenta ha sido creada exitosamente.\n\nGracias por unirte a nosotros.\n\nSaludos,\nEl equipo de CenfoCinemas";
+
+                var htmlContent = $@"
+                    <h2>¡Bienvenid@ a CenfoCinemas!</h2>
+                    <p>Hola <strong>{name}</strong>,</p>
+                    <p>Tu cuenta ha sido creada exitosamente.</p>
+                    <p>¡Gracias por unirte a nosotros!</p>
+                    <br>
+                    <p>Saludos,<br>El equipo de CenfoCinemas</p>";
+
+                var msg = MailHelper.CreateSingleEmail(from_email, to_email, subject, plainTextContent, htmlContent);
+
+                var response = await client.SendEmailAsync(msg);
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Accepted)
+                {
+                    Console.WriteLine($"Email enviado exitosamente a {email}");
+                }
+                else
+                {
+                    Console.WriteLine($"Error enviando email: {response.StatusCode}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error enviando email de bienvenida: {ex.Message}");
+                // No lanzar excepción aquí para no interrumpir la creación del usuario
+            }
         }
+
         private bool IsOver18(User user)
         {
-
             var currentDate = DateTime.Now;
             int age = currentDate.Year - user.BirthDate.Year;
 

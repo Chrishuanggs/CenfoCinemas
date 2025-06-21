@@ -67,51 +67,7 @@ namespace CoreApp
 
         private async Task SendWelcomeEmail(string email, string name)
         {
-            try
-            {
-                // La API key debe estar en configuración o variables de entorno
-                // NO hardcodear la API key en el código
-                var apiKey = Environment.GetEnvironmentVariable("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");
-
-                if (string.IsNullOrEmpty(apiKey))
-                {
-                    Console.WriteLine("Warning: SendGrid API key not found. Email not sent.");
-                    return;
-                }
-
-                var client = new SendGridClient(apiKey);
-                var from_email = new EmailAddress("chrishuang060@gmail.com", "CenfoCinemas");
-                var subject = "¡Bienvenido a CenfoCinemas!";
-                var to_email = new EmailAddress(email, name);
-
-                var plainTextContent = $"Hola {name},\n\n¡Bienvenid@ a CenfoCinemas! Tu cuenta ha sido creada exitosamente.\n\nGracias por unirte a nosotros.\n\nSaludos,\nEl equipo de CenfoCinemas";
-
-                var htmlContent = $@"
-                    <h2>¡Bienvenid@ a CenfoCinemas!</h2>
-                    <p>Hola <strong>{name}</strong>,</p>
-                    <p>Tu cuenta ha sido creada exitosamente.</p>
-                    <p>¡Gracias por unirte a nosotros!</p>
-                    <br>
-                    <p>Saludos,<br>El equipo de CenfoCinemas</p>";
-
-                var msg = MailHelper.CreateSingleEmail(from_email, to_email, subject, plainTextContent, htmlContent);
-
-                var response = await client.SendEmailAsync(msg);
-
-                if (response.StatusCode == System.Net.HttpStatusCode.Accepted)
-                {
-                    Console.WriteLine($"Email enviado exitosamente a {email}");
-                }
-                else
-                {
-                    Console.WriteLine($"Error enviando email: {response.StatusCode}");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error enviando email de bienvenida: {ex.Message}");
-                // No lanzar excepción aquí para no interrumpir la creación del usuario
-            }
+          
         }
 
         private bool IsOver18(User user)

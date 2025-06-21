@@ -64,7 +64,104 @@ namespace CoreApp
             var uCrud = new UserCrudFactory();
             return uCrud.RetrieveAll<User>();
         }
+        public User RetrieveById(int id)
+        {
+            try
+            {
+                var uCrud = new UserCrudFactory();
+                return uCrud.RetrieveById<User>(id);
+            }
+            catch (Exception ex)
+            {
+                ManagerException(ex);
+                return null;
+            }
+        }
 
+        public User RetrieveByUserCode(string userCode)
+        {
+            try
+            {
+                var uCrud = new UserCrudFactory();
+                var user = new User { UserCode = userCode };
+                return uCrud.RetrieveByUserCode<User>(user);
+            }
+            catch (Exception ex)
+            {
+                ManagerException(ex);
+                return null;
+            }
+        }
+
+        public User RetrieveByEmail(string email)
+        {
+            try
+            {
+                var uCrud = new UserCrudFactory();
+                var user = new User { Email = email };
+                return uCrud.RetrieveByEmail<User>(user);
+            }
+            catch (Exception ex)
+            {
+                ManagerException(ex);
+                return null;
+            }
+        }
+
+        public void Update(User user)
+        {
+            try
+            {
+                // Validaciones antes de actualizar
+                if (user.Id <= 0)
+                {
+                    throw new Exception("ID de usuario inválido");
+                }
+
+                var uCrud = new UserCrudFactory();
+
+                // Verificar que el usuario existe
+                var existingUser = uCrud.RetrieveById<User>(user.Id);
+                if (existingUser == null)
+                {
+                    throw new Exception("El usuario no existe");
+                }
+
+                // Validar edad si se actualiza fecha de nacimiento
+                if (user.BirthDate != default(DateTime) && !IsOver18(user))
+                {
+                    throw new Exception("Usuario debe ser mayor de 18 años");
+                }
+
+                uCrud.Update(user);
+            }
+            catch (Exception ex)
+            {
+                ManagerException(ex);
+            }
+        }
+
+        public void Delete(int userId)
+        {
+            try
+            {
+                var uCrud = new UserCrudFactory();
+
+                // Verificar que el usuario existe
+                var existingUser = uCrud.RetrieveById<User>(userId);
+                if (existingUser == null)
+                {
+                    throw new Exception("El usuario no existe");
+                }
+
+                var userToDelete = new User { Id = userId };
+                uCrud.Delete(userToDelete);
+            }
+            catch (Exception ex)
+            {
+                ManagerException(ex);
+            }
+        }
         private async Task SendWelcomeEmail(string email, string name)
         {
           

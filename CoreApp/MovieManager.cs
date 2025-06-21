@@ -59,22 +59,144 @@ namespace CoreApp
             }
         }
 
-        
-         // Metodo para validar que todos los campos obligatorios esten completos
-      
+        public List<Movie> RetrieveAll()
+        {
+            try
+            {
+                var mCrud = new MovieCrudFactory();
+                return mCrud.RetrieveAll<Movie>();
+            }
+            catch (Exception ex)
+            {
+                ManagerException(ex);
+                return new List<Movie>();
+            }
+        }
+
+        public Movie RetrieveById(int id)
+        {
+            try
+            {
+                if (id <= 0)
+                {
+                    throw new Exception("ID de película inválido");
+                }
+
+                var mCrud = new MovieCrudFactory();
+                return mCrud.RetrieveById<Movie>(id);
+            }
+            catch (Exception ex)
+            {
+                ManagerException(ex);
+                return null;
+            }
+        }
+
+        public Movie RetrieveByTitle(string title)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(title))
+                {
+                    throw new Exception("El título no puede estar vacío");
+                }
+
+                var mCrud = new MovieCrudFactory();
+                var movie = new Movie { Title = title };
+                return mCrud.RetrieveByTitle<Movie>(movie);
+            }
+            catch (Exception ex)
+            {
+                ManagerException(ex);
+                return null;
+            }
+        }
+
+        public void Update(Movie movie)
+        {
+            try
+            {
+                // Validar que los campos obligatorios tengan contenido
+                if (!ValidateRequiredFields(movie))
+                {
+                    throw new Exception("Todos los campos obligatorios deben ser completados");
+                }
+
+                if (movie.Id <= 0)
+                {
+                    throw new Exception("ID de película inválido");
+                }
+
+                var mCrud = new MovieCrudFactory();
+
+                // Verificar que la película existe
+                var existingMovie = mCrud.RetrieveById<Movie>(movie.Id);
+                if (existingMovie == null)
+                {
+                    throw new Exception("La película no existe");
+                }
+
+                // Validar que la fecha de lanzamiento no sea futura
+                if (!IsValidReleaseDate(movie.ReleaseDate))
+                {
+                    throw new Exception("La fecha de lanzamiento no puede ser en el futuro");
+                }
+
+                // Validar que no haya otra película con el mismo título (excluyendo la actual)
+                var movieWithSameTitle = mCrud.RetrieveByTitle<Movie>(movie);
+                if (movieWithSameTitle != null && movieWithSameTitle.Id != movie.Id)
+                {
+                    throw new Exception("Ya existe otra película con ese título");
+                }
+
+                mCrud.Update(movie);
+            }
+            catch (Exception ex)
+            {
+                ManagerException(ex);
+            }
+        }
+
+        public void Delete(int movieId)
+        {
+            try
+            {
+                if (movieId <= 0)
+                {
+                    throw new Exception("ID de película inválido");
+                }
+
+                var mCrud = new MovieCrudFactory();
+
+                // Verificar que la película existe
+                var existingMovie = mCrud.RetrieveById<Movie>(movieId);
+                if (existingMovie == null)
+                {
+                    throw new Exception("La película no existe");
+                }
+
+                var movieToDelete = new Movie { Id = movieId };
+                mCrud.Delete(movieToDelete);
+            }
+            catch (Exception ex)
+            {
+                ManagerException(ex);
+            }
+        }
+
+        private bool IsValidReleaseDate(DateTime releaseDate)
+        {
+            return releaseDate <= DateTime.Now;
+        }
+
+        // Metodo para validar que todos los campos obligatorios esten completos
+
         private bool ValidateRequiredFields(Movie movie)
         {
             return !string.IsNullOrEmpty(movie.Title) &&
                    !string.IsNullOrEmpty(movie.Description) &&
                    !string.IsNullOrEmpty(movie.Genre) &&
                    !string.IsNullOrEmpty(movie.Director);
-        }
-
-          //Metodo para validar que la fecha de lanzamiento no sea futura
-         
-        private bool IsValidReleaseDate(DateTime releaseDate)
-        {
-            return releaseDate <= DateTime.Now;
         }
     }
 }

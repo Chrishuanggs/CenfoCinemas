@@ -2,12 +2,6 @@
 using DTOs;
 using SendGrid;
 using SendGrid.Helpers.Mail;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CoreApp
 {
@@ -63,6 +57,12 @@ namespace CoreApp
             {
                 ManagerException(ex);
             }
+        }
+
+        public List<User> RetrieveAll()
+        {
+            var uCrud = new UserCrudFactory();
+            return uCrud.RetrieveAll<User>();
         }
 
         private async Task SendWelcomeEmail(string email, string name)

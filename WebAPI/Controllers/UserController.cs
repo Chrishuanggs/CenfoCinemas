@@ -15,12 +15,22 @@ namespace WebAPI.Controllers
         {
             try
             {
+                // ✅ Validar que user no sea null
+                if (user == null)
+                {
+                    return BadRequest("User data is required");
+                }
+
                 var um = new UserManager();
                 await um.Create(user);
                 return Ok(new { message = "Usuario creado exitosamente", user = user });
             }
             catch (Exception ex)
             {
+                // ✅ Log del error para debugging
+                Console.WriteLine($"Error creating user: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+
                 return StatusCode(500, new { error = ex.Message });
             }
         }

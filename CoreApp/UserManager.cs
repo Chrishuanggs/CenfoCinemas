@@ -21,7 +21,7 @@ namespace CoreApp
             try
             {
                 //Validar la edad
-                if (IsOver18(user))
+                if (user != null && IsOver18(user))
                 {
                     var uCrud = new UserCrudFactory();
 

@@ -20,6 +20,10 @@ namespace DataAccess.CRUD
         public override void Create(BaseDTO baseDTO)
         {
             var user = baseDTO as User;
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(baseDTO));
+            }
 
             var sqlOperation = new SqlOperation() { ProcedureName = "CRE_USER_PR" };
             sqlOperation.AddStringParameter("P_UserCode", user.UserCode);

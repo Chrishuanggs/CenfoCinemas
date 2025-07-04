@@ -104,7 +104,7 @@ function UsersViewController() {
         userDTO.email = $('#txtEmail').val();
         userDTO.status = $('#txtStatus').val();
         userDTO.birthDate = $('#txtBirthDate').val();
-        userDTO.passwowrd = $('#txtPassword').val();
+        userDTO.password = $('#txtPassword').val();
 
         //Enviar la data al API
         var ca = new ControlActions();
